@@ -17,7 +17,7 @@
         </g:if>
         
         <g:form name="importSkillsForm" controller="skills" action="doImport">
-            <g:textArea name="importSkills" cols="200" rows="50" />
+            <g:textArea name="importSkills" class="span6" rows="30" />
 
             <g:submitButton name="importSkillsSubmit" value="Import" />
         </g:form>
