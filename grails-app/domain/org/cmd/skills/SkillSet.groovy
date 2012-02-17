@@ -7,8 +7,9 @@ class SkillSet {
     User user
 
     Skill skill
-    int level
-    int bonus
+    Integer level
+    Integer bonus
+    Boolean hidden = false
 
     static constraints = {
         skill (nullable: false)

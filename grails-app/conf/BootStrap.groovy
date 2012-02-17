@@ -1,5 +1,6 @@
 import org.cmd.skills.Role
 import org.cmd.skills.Skill
+import org.cmd.skills.Guild
 import org.cmd.skills.User
 import org.cmd.skills.UserRole
 
@@ -15,6 +16,7 @@ class BootStrap {
         UserRole.create(testUser, adminRole, true)
 
         createSkills()
+        createGuilds()
     }
 	
     private void createSkills() {
@@ -271,6 +273,31 @@ class BootStrap {
         new Skill(name: 'people.trading.valueing.gems', root: false, leaf: true).save(flush: true)
         new Skill(name: 'people.trading.valueing.jewellery', root: false, leaf: true).save(flush: true)
         new Skill(name: 'people.trading.valueing.weapons', root: false, leaf: true).save(flush: true)
+    }
+    
+    private void createGuilds() {
+        log.info("Bootstrapping guilds.")
+        
+        Guild adventurers = new Guild(longName: "Adventurers", shortName: "Adventurers", root: true).save(flush: true)
+        Guild assassins = new Guild(longName: "Assassins", shortName: "Assassins", root: true).save(flush: true)
+        Guild priests = new Guild(longName: "Priests", shortName: "Priests", root: true).save(flush: true)
+        Guild thieves = new Guild(longName: "Thieves", shortName: "Thieves", root: true).save(flush: true)
+        Guild warriors = new Guild(longName: "Warriors", shortName: "Warriors", root: true).save(flush: true)
+        Guild witches = new Guild(longName: "Witches", shortName: "Witches", root: true).save(flush: true)
+        Guild wizards = new Guild(longName: "Wizards", shortName: "Wizards", root: true).save(flush: true)
+        
+        new Guild(longName: "Conlegium Sicariorum", shortName: "CS", root: false).save(flush: true)
+        new Guild(longName: "Hashishim", shortName: "Hashishim", root: false).save(flush: true)
+        new Guild(longName: "Mano Rossa", shortName: "Mano Rossa", root: false).save(flush: true)
+        new Guild(longName: "Ninja", shortName: "Ninja", root: false).save(flush: true)
+        
+        new Guild(longName: "Fish", shortName: "Fish", root: false).save(flush: true)
+        new Guild(longName: "Gapp", shortName: "Gapp", root: false).save(flush: true)
+        new Guild(longName: "Gufnork", shortName: "Gufnork", root: false).save(flush: true)
+        new Guild(longName: "Hat", shortName: "Hat", root: false).save(flush: true)
+        new Guild(longName: "Pishe", shortName: "Pishe", root: false).save(flush: true)
+        new Guild(longName: "Sandelfon", shortName: "Sandelfon", root: false).save(flush: true)
+        new Guild(longName: "Sek", shortName: "Sek", root: false).save(flush: true)
     }
 	
     def destroy = {
