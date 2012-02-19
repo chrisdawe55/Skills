@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title><g:layoutTitle default="Grails"/></title>
+    <title><g:layoutTitle default="Discworld Skillpages"/></title>
     <meta name="description" content="Discworld MUD Skillpages">
     <meta name="author" content="Balzaar / Kawakisan">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,6 +26,9 @@
       body {
         padding-top: 60px;
       }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
     </style>
     
     <g:layoutHead />
@@ -42,14 +45,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">Discworld Skillpages</a>
+          <g:link class="brand" controller="default" action="index">Discworld Skillpages</g:link>
           <div class="nav-collapse">
             <ul class="nav">
               <li class="active"><g:link controller="default" action="index">Home</g:link></li>
               <li><a href="#about">About</a></li>
               <li><a href="#contact">Contact</a></li>
             </ul>
-            <p class="navbar-text pull-right">Logged in as <a href="#"><sec:loggedInUserInfo field="username" /></a></p>
+            <g:form class="navbar-search pull-left" controller="skills" action="search">
+              <g:textField name="searchName" class="search-query" placeholder="Search" />
+            </g:form>
+            <sec:ifLoggedIn>
+              <p class="navbar-text pull-right">Logged in as <a href="#"><sec:loggedInUserInfo field="username" /></a>&nbsp;<g:link controller="logout">Logout</g:link></p>
+            </sec:ifLoggedIn>
           </div><!--/.nav-collapse -->
         </div>
       </div>
@@ -61,8 +69,8 @@
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
               <li class="nav-header">Sidebar</li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
+              <li class="${session.currentNav == 'loginauth' ? 'active' : ''}"><g:link controller="login" action="auth">Login</g:link></li>
+              <li class="${session.currentNav == 'skillsmySkills' ? 'active' : ''}"><g:link controller="skills" action="mySkills">My Skills</g:link></li>
               <li><a href="#">Link</a></li>
               <li><a href="#">Link</a></li>
               <li class="nav-header">Sidebar</li>
@@ -74,7 +82,7 @@
               <li><a href="#">${session.currentNav}</a></li>
               <li class="nav-header">Import</li>
               <li class="${session.currentNav == 'skillsimportSkills' ? 'active' : ''}"><g:link controller="skills" action="importSkills">Import Skills</g:link></li>
-              <li><a href="#">Import Score</a></li>
+              <li class="${session.currentNav == 'skillsimportScore' ? 'active' : ''}"><g:link controller="skills" action="importScore">Import Score</g:link></li>
             </ul>
           </div><!--/.well -->
         </div><!--/span-->

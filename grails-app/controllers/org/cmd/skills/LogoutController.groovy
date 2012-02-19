@@ -1,3 +1,5 @@
+package org.cmd.skills
+
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 
 class LogoutController {

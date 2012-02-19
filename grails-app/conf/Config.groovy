@@ -10,7 +10,6 @@
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
-
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
@@ -34,7 +33,6 @@ grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
 
 // What URL patterns should be processed by the resources plugin
 grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']
-
 
 // The default codec used to encode data with ${}
 grails.views.default.codec = "none" // none, html, base64
@@ -97,4 +95,10 @@ log4j = {
 grails.plugins.springsecurity.userLookup.userDomainClassName = 'org.cmd.skills.User'
 grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'org.cmd.skills.UserRole'
 grails.plugins.springsecurity.authority.className = 'org.cmd.skills.Role'
-grails.plugins.springsecurity.successHandler.defaultTargetUrl = '/default/index'
+grails.plugins.springsecurity.dao.reflectionSaltSourceProperty = 'username'
+grails.plugins.springsecurity.successHandler.defaultTargetUrl = '/skills/mySkills'
+grails.plugins.springsecurity.securityConfigType = "Annotation"
+
+grails.plugin.cloudfoundry.username = 'chris.dawe1@gmail.com'
+grails.plugin.cloudfoundry.password = 'WkhepWrO'
+grails.plugin.cloudfoundry.appname = 'skills'

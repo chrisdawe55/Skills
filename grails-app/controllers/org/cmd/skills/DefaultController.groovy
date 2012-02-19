@@ -1,64 +1,20 @@
 package org.cmd.skills
 
-import grails.plugins.springsecurity.Secured
-
 class DefaultController {
 	
     def springSecurityService
 
     def index = {
-        [skills: Skill.findAll()]
-    }
-	
-    @Secured(['ROLE_ADMIN', 'ROLE_USER'])
-    def login = {
-        render 'You are logged in.'
-    }
-
-    @Secured(['ROLE_ADMIN', 'ROLE_USER'])
-    def importSkills = {
-        User user = springSecurityService.currentUser
-
-        [user: user]
-    }
-
-    @Secured(['ROLE_ADMIN', 'ROLE_USER'])
-    def doImport = { ImportSkillsCommand cmd ->
-        User user = springSecurityService.currentUser
-
-        String[] lines = cmd.importSkills.split("\n")
-        String[] skills = ["", "", "", ""]
-
-        lines.each { String line ->
-            String[] parts = line.split()
-            int theCount = line.count("|")
-            String level = ""
-            String bonus = ""
-
-            skills[theCount] = parts[theCount].replace(".", "")
-
-            for (int i = theCount + 1 ; i < 4 ; i++) {
-                skills[i] = ""
-            }
-
-            Skill theSkill = Skill.findByName((skills[0]) +(skills[1] != '' ? '.' +skills[1] : '') +(skills[2] != '' ? '.' +skills[2] : '') +(skills[3] != '' ? '.' +skills[3] : ''))
-            SkillSet usersSkill = SkillSet.findByUserAndSkill(user, theSkill)
-
-            if (parts[theCount + 1] != "-") {
-                if (usersSkill) {
-                    usersSkill.level = parts[theCount + 1] as Integer
-                    usersSkill.bonus = parts[theCount + 2] as Integer
-                } else {
-                    usersSkill = new SkillSet(user: user, skill: theSkill, level: parts[theCount + 1] as Integer, bonus: parts[theCount + 2] as Integer).save(flush: true)
-                }
-            }
-
-            log.debug(line)
-            log.debug("Skill2: " +theSkill)
-            log.debug("Level: " +parts[theCount + 1])
-            log.debug("Bonus: " +parts[theCount + 2])
-        }
-
-        redirect (action: "importSkills")
+        List skills = Skill.list()
+        
+        List adventuring = skills.findAll { it.name.startsWith("adventuring") }.sort { it.name }
+        List covert = skills.findAll { it.name.startsWith("covert") }.sort { it.name }
+        List crafts = skills.findAll { it.name.startsWith("crafts") }.sort { it.name }
+        List faith = skills.findAll { it.name.startsWith("faith") }.sort { it.name }
+        List fighting = skills.findAll { it.name.startsWith("fighting") }.sort { it.name }
+        List magic = skills.findAll { it.name.startsWith("magic") }.sort { it.name }
+        List people = skills.findAll { it.name.startsWith("people") }.sort { it.name }
+        
+        [adventuring: adventuring, covert: covert, crafts: crafts, faith: faith, fighting: fighting, magic: magic, people: people]
     }
 }

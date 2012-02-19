@@ -4,14 +4,14 @@ class Guild {
 
     static hasMany = [ members: User ]
     
-    String longName
-    String shortName
+    Guild parent
+    String name
     
     Boolean root
     
     static constraints = {
-        longName (nullable: false)
-        shortName (nullable: false)
+        parent (nullable: true)
+        name (nullable: false)
         root (nullable: false)
     }
 }
