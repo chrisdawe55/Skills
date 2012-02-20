@@ -68,18 +68,20 @@
         <div class="span3">
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
-              <li class="nav-header">Sidebar</li>
+              <li class="nav-header">Skill Trees</li>
+              <li><a href="#">All Skills</a></li>
+              <li><a href="#">Adventuring</a></li>
+              <li><a href="#">Covert</a></li>
+              <li><a href="#">Crafts</a></li>
+              <li><a href="#">Faith</a></li>
+              <li><a href="#">Fighting</a></li>
+              <li><a href="#">Magic</a></li>
+              <li><a href="#">People</a></li>
+              <li class="nav-header">Options</li>
               <li class="${session.currentNav == 'loginauth' ? 'active' : ''}"><g:link controller="login" action="auth">Login</g:link></li>
               <li class="${session.currentNav == 'skillsmySkills' ? 'active' : ''}"><g:link controller="skills" action="mySkills">My Skills</g:link></li>
               <li><a href="#">Link</a></li>
               <li><a href="#">Link</a></li>
-              <li class="nav-header">Sidebar</li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">${session.currentNav}</a></li>
               <li class="nav-header">Import</li>
               <li class="${session.currentNav == 'skillsimportSkills' ? 'active' : ''}"><g:link controller="skills" action="importSkills">Import Skills</g:link></li>
               <li class="${session.currentNav == 'skillsimportScore' ? 'active' : ''}"><g:link controller="skills" action="importScore">Import Score</g:link></li>

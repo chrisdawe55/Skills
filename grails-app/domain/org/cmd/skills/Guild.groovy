@@ -2,7 +2,7 @@ package org.cmd.skills
 
 class Guild {
 
-    static hasMany = [ members: User ]
+    static hasMany = [ members: User, primaries: Skill ]
     
     Guild parent
     String name

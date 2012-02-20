@@ -6,34 +6,37 @@
   </head>
 
   <body>
+    <ul class="breadcrumb">
+      <li>
+        <g:link controller="default" action="index">Home</g:link> <span class="divider">/</span>
+      </li>
+      <li class="active">Search</li>
+    </ul>
+    
     <div class="well">
-      <div class="row-fluid">
-        <g:if test="${flash.message}">
-          <div class="alert alert-info">
-            ${flash.message}
-          </div>
-        </g:if>
+      <g:if test="${flash.message}">
+        <div class="alert alert-info">
+          ${flash.message}
+        </div>
+      </g:if>
 
-        <g:if test="${flash.error}">
-          <div class="alert alert-error">
-            ${flash.error}
-          </div>
-        </g:if>
-      </div>
+      <g:if test="${flash.error}">
+        <div class="alert alert-error">
+          ${flash.error}
+        </div>
+      </g:if>
       
       <g:if test="${user}">
-        <div class="row-fluid">
-          <h1>${user}</h1>
-          <br />
+        <h1>${user}</h1>
+        <br />
 
-          <p>Last Updated <g:formatDate format="dd MMM yyyy" date="${user.lastUpdated}" /></p>
-          <p>Level ${user.guildLevel} ${user.guild?.name}</p>
-          <br />
-        </div>
+        <p>Last Updated <g:formatDate format="dd MMM yyyy" date="${user.lastUpdated}" /></p>
+        <p>Level ${user.guildLevel} ${user.guild?.name}</p>
+        <br />
         
         <div class="row-fluid">
           <div class="span6">
-            <h2>Top 15 Levels</h2>
+            <h3>Top 15 Levels</h3>
             <table class="table table-bordered table-condensed">
               <thead>
                 <tr>
@@ -55,7 +58,7 @@
           </div>
           
           <div class="span6">
-            <h2>Top 15 Bonuses</h2>
+            <h3>Top 15 Bonuses</h3>
             <table class="table table-bordered table-condensed">
               <thead>
                 <tr>

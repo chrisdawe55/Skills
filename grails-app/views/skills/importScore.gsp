@@ -54,6 +54,56 @@
 
         <g:textArea name="importScore" class="span8" rows="10" value="${cmd?.importScore}" />
       </g:form>
+      
+      <div class="row-fluid">
+        <g:if test="${newSkills}">
+          <div class="span6">
+            <h3>New Skills</h3>
+            <table class="table table-condensed">
+              <thead>
+                <tr>
+                  <th width="60%">Skill</th>
+                  <th width="20%">Level</th>
+                  <th width="20%">Bonus</th>
+                </tr>
+              </thead>
+              <tbody>
+                <g:each in="${newSkills}" var="skill">
+                  <tr>
+                    <td>${skill.skill.name}</td>
+                    <td>${skill.level}</td>
+                    <td>${skill.bonus}</td>
+                  </tr>
+                </g:each>
+              </tbody>
+            </table>
+          </div>
+        </g:if>
+
+        <g:if test="${updatedSkills}">
+          <div class="span6">
+            <h3>Updated Skills</h3>
+            <table class="table table-condensed">
+              <thead>
+                <tr>
+                  <th width="60%">Skill</th>
+                  <th width="20%">Old Level</th>
+                  <th width="20%">New Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                <g:each in="${updatedSkills}" var="skill">
+                  <tr>
+                    <td>${skill.skill}</td>
+                    <td>${skill.oldLevel}</td>
+                    <td>${skill.newLevel}</td>
+                  </tr>
+                </g:each>
+              </tbody>
+            </table>
+          </div>
+        </g:if>
+      </div>
     </div>
   </body>
 </html>

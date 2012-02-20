@@ -14,9 +14,10 @@ class SkillsController {
     def mySkills = {
         User user = User.get(springSecurityService.principal.id)
         
-        List skills = user.skills?.sort { it.skill.name }
+        List levels = user.skills?.sort { it.level }?.reverse()
+        List bonuses = user.skills?.sort { it.bonus }?.reverse()
         
-        [skills: skills]
+        render (view: "show", model: [user: user, levels: levels?.size() > 15 ? levels[0..14] : levels, bonuses: bonuses?.size() > 15 ? bonuses[0..14] : bonuses])
     }
     
     def importSkills = {
@@ -35,9 +36,9 @@ class SkillsController {
         
         User user = User.findByUsernameAndPassword(cmd.username, springSecurityService.encodePassword(cmd.password, cmd.username))
         if (!user) {
-            if (!User.findByUsername(cmd.username) == null) {
-                flash.error = "Password incorrect."
-                render (view: "importScore", model: [cmd: cmd])
+            if (User.createCriteria().get { ilike ("username", cmd.username) }) {
+                flash.error = "Username or password incorrect."
+                render (view: "importSkills", model: [cmd: cmd])
                 return
             } else {
                 Role role = Role.findByAuthority("ROLE_USER")
@@ -48,24 +49,13 @@ class SkillsController {
         }
         
         if (cmd.importSkills.contains("..")) {
-            if (!importBranched(cmd, user)) {
-                flash.error = "Error importing skills."
-                render (view: "importSkills", model: [cmd: cmd])
-                return
-            }
+            importBranched(cmd, user)
         } else {
-            if (!importList(cmd, user)) {
-                flash.error = "Error importing skills."
-                render (view: "importSkills", model: [cmd: cmd])
-                return
-            }
+            importList(cmd, user)
         }
 
-        user.lastUpdated = new Date()
-        user.save(flush: true)
-        
-        flash.message = "Successfully imported skills."
-        redirect (action: "importScore", params: [username: user.username])
+//        user.lastUpdated = new Date()
+//        user.save(flush: true)
     }
     
     def doImportScore = { ImportScoreCommand cmd ->
@@ -82,8 +72,8 @@ class SkillsController {
         }
 
         if (!user) {
-            if (User.findByUsername(cmd.username)) {
-                flash.error = "Password incorrect."
+            if (User.createCriteria().get { ilike ("username", cmd.username) }) {
+                flash.error = "Username or password incorrect."
                 render (view: "importScore", model: [cmd: cmd])
                 return
             } else {
@@ -149,17 +139,48 @@ class SkillsController {
         render (view: "show", model: [user: user, levels: levels?.size() > 15 ? levels[0..14] : levels, bonuses: bonuses?.size() > 15 ? bonuses[0..14] : bonuses])
     }
     
-    private Boolean importBranched(ImportSkillsCommand cmd, User user) {
+    private void importBranched(ImportSkillsCommand cmd, User user) {
+        List newSkills = []
+        List updatedSkills = []
+        
         try {
             String[] lines = cmd.importSkills.split("\n")
             String[] skills = ["", "", "", ""]
+            
+            List<String[]> col1 = []
+            List<String[]> col2 = []
+            List<String[]> col3 = []
+            List<String[]> col4 = []
 
             lines.each { String line ->
                 if (line.contains("=")) {
                     return
                 }
+                
                 String[] parts = line.split()
-                int theCount = line.count("|")
+                
+                int ind = 0
+                boolean carryOn = true
+                for (int i = 0 ; i < 4 && carryOn ; i++) {
+                    ind = parts.findIndexOf { it.contains(".") }
+                    
+                    if (i == 0) { col1.add(parts[0..ind + 2]) }
+                    else if (i == 1) { col2.add(parts[0..ind + 2]) }
+                    else if (i == 2) { col3.add(parts[0..ind + 2]) }
+                    else if (i == 3) { col4.add(parts[0..ind + 2]) }
+                    
+                    if (parts.size() > (ind + 3)) {
+                        parts = parts[ind + 3..-1]
+                    } else {
+                        carryOn = false
+                    }
+                }
+            }
+            
+            List<String[]> fullList = col1 + col2 + col3 + col4
+            
+            fullList.each { def parts ->
+                int theCount = parts.count { it == "|" }
                 String level = ""
                 String bonus = ""
 
@@ -172,23 +193,35 @@ class SkillsController {
                 Skill theSkill = Skill.findByName((skills[0]) +(skills[1] != '' ? '.' +skills[1] : '') +(skills[2] != '' ? '.' +skills[2] : '') +(skills[3] != '' ? '.' +skills[3] : ''))
                 SkillSet usersSkill = SkillSet.findByUserAndSkill(user, theSkill)
 
-                if (parts[theCount + 1] != "-") {
+                if (parts[theCount + 1] != "-" && parts[theCount + 2] != "-") {
                     if (usersSkill) {
-                        usersSkill.level = parts[theCount + 1] as Integer
-                        usersSkill.bonus = parts[theCount + 2] as Integer
+                        if (usersSkill.level != parts[theCount + 1] as Integer || usersSkill.bonus != parts[theCount + 2] as Integer) {
+                            updatedSkills.add([skill: usersSkill.skill.name, oldLevel: usersSkill.level, newLevel: parts[theCount + 1] as Integer])
+                            usersSkill.level = parts[theCount + 1] as Integer
+                            usersSkill.bonus = parts[theCount + 2] as Integer
+                            usersSkill.save(flush: true)
+                        }
                     } else {
                         usersSkill = new SkillSet(user: user, skill: theSkill, level: parts[theCount + 1] as Integer, bonus: parts[theCount + 2] as Integer).save(flush: true)
+                        newSkills.add(usersSkill)
                     }
                 }
             }
         } catch (Exception e) {
-            return false
+            System.out.println(e)
+            flash.error = "Error importing skills."
+            render (view: "importSkills", model: [cmd: cmd])
+            return
         }
         
-        return true
+        flash.message = "Successfully imported skills."
+        render (view: "importScore", model: [username: user.username, newSkills: newSkills, updatedSkills: updatedSkills])
     }
     
     private Boolean importList(ImportSkillsCommand cmd, User user) {
+        List newSkills = []
+        List updatedSkills = []
+        
         try {
             String[] lines = cmd.importSkills.split("\n")
             String[] skills = ["", "", "", ""]
@@ -206,18 +239,26 @@ class SkillsController {
 
                 if (parts[1] != "X" && parts[2] != "X") {
                     if (usersSkill) {
-                        usersSkill.level = parts[1] as Integer
-                        usersSkill.bonus = parts[2] as Integer
+                        if (usersSkill.level != parts[theCount + 1] as Integer || usersSkill.bonus != parts[theCount + 2] as Integer) {
+                            updatedSkills.add([skill: usersSkill.skill.name, oldLevel: usersSkill.level, newLevel: parts[theCount + 1] as Integer])
+                            usersSkill.level = parts[1] as Integer
+                            usersSkill.bonus = parts[2] as Integer
+                        }
                     } else {
                         usersSkill = new SkillSet(user: user, skill: theSkill, level: parts[1] as Integer, bonus: parts[2] as Integer).save(flush: true)
+                        newSkills.add(usersSkill)
                     }
                 }
             }
         } catch (Exception e) {
-            return false
+            System.out.println(e)
+            flash.error = "Error importing skills."
+            render (view: "importSkills", model: [cmd: cmd])
+            return
         }
         
-        return true
+        flash.message = "Successfully imported skills."
+        render (view: "importScore", model: [username: user.username, newSkills: newSkills, updatedSkills: updatedSkills])
     }
 }
 

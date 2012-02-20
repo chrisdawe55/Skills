@@ -16,9 +16,9 @@ environments {
             dbCreate = "create-drop"
             url = "jdbc:h2:mem:devDB"
 
-//            dbCreate = "update"
+//            dbCreate = "create-drop"
 //            driverClassName = "com.mysql.jdbc.Driver"
-//            url = "jdbc:mysql://localhost/gigregister"
+//            url = "jdbc:mysql://localhost/skills"
 //            username = "root"
 //            password = "ax0nuk"
         }
