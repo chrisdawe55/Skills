@@ -36,10 +36,15 @@ class SkillsController {
         
         User user = User.findByUsernameAndPassword(cmd.username, springSecurityService.encodePassword(cmd.password, cmd.username))
         if (!user) {
-            if (User.createCriteria().get { ilike ("username", cmd.username) }) {
-                flash.error = "Username or password incorrect."
-                render (view: "importSkills", model: [cmd: cmd])
-                return
+            User testUser = User.createCriteria().get { ilike ("username", cmd.username) }
+            if (testUser) {
+                if (testUser.password == springSecurityService.encodePassword(cmd.password, testUser.username)) {
+                    user = testUser
+                } else {
+                    flash.error = "Username or password incorrect."
+                    render (view: "importSkills", model: [cmd: cmd])
+                    return
+                }
             } else {
                 Role role = Role.findByAuthority("ROLE_USER")
                 user = new User(username: cmd.username, password: cmd.password, enabled: true)
@@ -53,9 +58,6 @@ class SkillsController {
         } else {
             importList(cmd, user)
         }
-
-//        user.lastUpdated = new Date()
-//        user.save(flush: true)
     }
     
     def doImportScore = { ImportScoreCommand cmd ->
@@ -72,10 +74,16 @@ class SkillsController {
         }
 
         if (!user) {
-            if (User.createCriteria().get { ilike ("username", cmd.username) }) {
-                flash.error = "Username or password incorrect."
-                render (view: "importScore", model: [cmd: cmd])
-                return
+            User testUser = User.createCriteria().get { ilike ("username", cmd.username) }
+            if (testUser) {
+                if (testUser.password == springSecurityService.encodePassword(cmd.password, testUser.username)) {
+                    user = testUser
+                    System.out.println("** User Set!")
+                } else {
+                    flash.error = "Username or password incorrect."
+                    render (view: "importScore", model: [cmd: cmd])
+                    return
+                }
             } else {
                 Role role = Role.findByAuthority("ROLE_USER")
                 user = new User(username: cmd.username, password: cmd.password, enabled: true)
@@ -93,11 +101,24 @@ class SkillsController {
 
                     user.rating = Integer.parseInt(parts[parts.findIndexOf{ it == "rating" } + 2].replace(".", ""))
 
-                    user.guildLevel = Integer.parseInt(parts[parts.findIndexOf{ it == "level" } + 1])
-
-                    Guild.list().each {
-                        if (line.contains(it.name)) {
-                            user.guild = it
+                    if (parts.findIndexOf { it.startsWith("Wizards") } > -1) {
+                        user.guild = Guild.findByName("Students")
+                    } else if (parts.findIndexOf { it.startsWith("Adventurers") } > -1) {
+                        user.guild = Guild.findByName("Adventurers")
+                    } else if (parts.findIndexOf { it.startsWith("Djinn") } > -1 || parts.findIndexOf { it.startsWith("Scarab") } > -1 || parts.findIndexOf { it.startsWith("Crescent") } > -1) {
+                        user.guild = Guild.findByName("Klatch")
+                    } else {
+                        Guild.list().each { Guild guild ->
+                            if (guild.name.split().size() > 1) {
+                                String[] guildName = guild.name.split()
+                                if (parts.findIndexOf { it.startsWith(guildName[0]) } > -1 && parts.findIndexOf { it.startsWith(guildName[1]) } > -1) {
+                                    user.guild = guild
+                                }
+                            } else {
+                                if (parts.findIndexOf { it.startsWith(guild.name) } > -1) {
+                                    user.guild = guild
+                                }
+                            }
                         }
                     }
                 }
@@ -111,6 +132,23 @@ class SkillsController {
 
                     user.deaths = Integer.parseInt(parts[parts.findIndexOf{ it == "died" } + 1])
                 }
+                
+                if (line.contains("and have logged")) {
+                    String[] parts = line.split()
+                    
+                    if (parts.findIndexOf { it.startsWith("year") } > -1) {
+                        user.years = Integer.parseInt(parts[parts.findIndexOf{ it.startsWith("year") } - 1])
+                    }
+                    if (parts.findIndexOf { it.startsWith("day") } > -1) {
+                        user.days = Integer.parseInt(parts[parts.findIndexOf{ it.startsWith("day") } - 1])
+                    }
+                    if (parts.findIndexOf { it.startsWith("hour") } > -1) {
+                        user.hours = Integer.parseInt(parts[parts.findIndexOf{ it.startsWith("hour") } - 1])
+                    }
+                    if (parts.findIndexOf { it.startsWith("minute") } > -1) {
+                        user.minutes = Integer.parseInt(parts[parts.findIndexOf{ it.startsWith("minute") } - 1])
+                    }
+                }
             }
         } catch (Exception e) {
             flash.error = "Error importing score."
@@ -118,8 +156,27 @@ class SkillsController {
             return
         }
         
+        user.save(flush: true)
+        user.lastUpdated = new Date()
+        user.guildLevel = setGuildLevel(user)
+        user.save(flush: true)
         flash.message = "Successfully imported score."
         redirect (action: "search", params: [searchName: user.username])
+    }
+    
+    def show = {
+        User user = User.get(params.id as Long)
+        
+        if (!user) {
+            flash.error = "User not found."
+            render (view: "show", model: [user: null])
+            return
+        }
+        
+        List levels = user.skills?.sort { it.level }?.reverse()
+        List bonuses = user.skills?.sort { it.bonus }?.reverse()
+        
+        render (view: "show", model: [user: user, levels: levels?.size() > 15 ? levels[0..14] : levels, bonuses: bonuses?.size() > 15 ? bonuses[0..14] : bonuses])
     }
     
     def search = { params ->
@@ -214,6 +271,10 @@ class SkillsController {
             return
         }
         
+        user.save(flush: true)
+        user.lastUpdated = new Date()
+        user.guildLevel = setGuildLevel(user)
+        user.save(flush: true)
         flash.message = "Successfully imported skills."
         render (view: "importScore", model: [username: user.username, newSkills: newSkills, updatedSkills: updatedSkills])
     }
@@ -257,8 +318,32 @@ class SkillsController {
             return
         }
         
+        user.save(flush: true)
+        user.lastUpdated = new Date()
+        user.guildLevel = setGuildLevel(user)
+        user.save(flush: true)
         flash.message = "Successfully imported skills."
         render (view: "importScore", model: [username: user.username, newSkills: newSkills, updatedSkills: updatedSkills])
+    }
+    
+    private Integer setGuildLevel(User user) {
+        if (!user.guild) {
+            return 0
+        }
+            
+        Guild guild = user.guild
+        Integer skillTotal = 0
+        
+        guild.primaries.each { Skill primary ->
+            Integer level = user.skills?.find { it.skill.name == primary.name }?.level
+            skillTotal += level ?: 0
+        }
+        
+        if (guild.parent == Guild.findByName("Priests")) {
+            return (skillTotal / 14) as Integer
+        } else {
+            return (skillTotal / 15) as Integer
+        }
     }
 }
 

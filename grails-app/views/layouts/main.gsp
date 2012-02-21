@@ -17,7 +17,7 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     
-    <link rel="shortcut icon" href="${resource(dir: 'images', file: 'favicon.ico')}" type="image/x-icon">
+    <link rel="shortcut icon" href="${resource(dir: 'images', file: 'favicon2.ico')}" type="image/x-icon">
     <link rel="apple-touch-icon" href="${resource(dir: 'images', file: 'apple-touch-icon.png')}">
     <link rel="apple-touch-icon" sizes="114x114" href="${resource(dir: 'images', file: 'apple-touch-icon-retina.png')}">
     <link rel="stylesheet" href="${resource(dir: 'css', file: 'bootstrap.css')}" type="text/css">
@@ -41,16 +41,14 @@
       <div class="navbar-inner">
         <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
+            <span class="icon-bar">test</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
           <g:link class="brand" controller="default" action="index">Discworld Skillpages</g:link>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="active"><g:link controller="default" action="index">Home</g:link></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li class="${session.currentNav == 'defaultindex' ? 'active' : ''}"><g:link controller="default" action="index">Home</g:link></li>
             </ul>
             <g:form class="navbar-search pull-left" controller="skills" action="search">
               <g:textField name="searchName" class="search-query" placeholder="Search" />
@@ -77,10 +75,12 @@
               <li><a href="#">Fighting</a></li>
               <li><a href="#">Magic</a></li>
               <li><a href="#">People</a></li>
+              <li class="nav-header">Masters</li>
+              <li class="${session.currentNav == 'guildspec' ? 'active' : ''}"><g:link controller="guild" action="spec">Best In Guilds</g:link></li>
               <li class="nav-header">Options</li>
               <li class="${session.currentNav == 'loginauth' ? 'active' : ''}"><g:link controller="login" action="auth">Login</g:link></li>
               <li class="${session.currentNav == 'skillsmySkills' ? 'active' : ''}"><g:link controller="skills" action="mySkills">My Skills</g:link></li>
-              <li><a href="#">Link</a></li>
+              <li><g:link controller="guild" action="listMembers">Link</g:link></li>
               <li><a href="#">Link</a></li>
               <li class="nav-header">Import</li>
               <li class="${session.currentNav == 'skillsimportSkills' ? 'active' : ''}"><g:link controller="skills" action="importSkills">Import Skills</g:link></li>

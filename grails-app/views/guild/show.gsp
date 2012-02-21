@@ -7,10 +7,9 @@
 
   <body>
     <ul class="breadcrumb">
-      <li>
-        <g:link controller="default" action="index">Home</g:link> <span class="divider">/</span>
-      </li>
-      <li class="active">Search</li>
+      <li><g:link controller="default" action="index">Home</g:link> <span class="divider">/</span></li>
+      <li><g:link controller="guild" action="spec">Choose Specialisation</g:link> <span class="divider">/</span></li>
+      <li class="active">Show Guild</li>
     </ul>
     
     <div class="well">
@@ -26,31 +25,25 @@
         </div>
       </g:if>
       
-      <h1>${user ?: "Skills"}</h1>
-      <g:if test="${user}">
+      <h1>${guild ? (guild.parent ? "${guild.parent} - ${guild}" : "${guild}") : "Guild"}</h1>
+      <g:if test="${guild}">
         <br />
 
-        <p>Last Updated <g:formatDate format="dd MMM yyyy" date="${user.lastUpdated}" /></p>
-        <p>Level ${user.guildLevel} in the ${user.guild?.name}</p>
-        <br />
-        
         <div class="row-fluid">
           <div class="span6">
-            <h3>Top 15 Levels</h3>
+            <h3>Top 15</h3>
             <table class="table table-bordered table-condensed table-striped">
               <thead>
                 <tr>
-                  <th width="60%">Skill</th>
-                  <th width="20%">Level</th>
-                  <th width="20%">Bonus</th>
+                  <th width="70%">Member</th>
+                  <th width="30%">Guild Level</th>
                 </tr>
               </thead>
               <tbody>
-                <g:each in="${levels}" var="skill">
-                  <tr>
-                    <td>${skill.skill.name}</td>
-                    <td>${skill.level}</td>
-                    <td>${skill.bonus}</td>
+                <g:each in="${members}" var="member">
+                  <tr style="cursor: pointer;" onclick="location.href='<g:createLink controller='skills' action='show' id='${member.id}' />'">
+                    <td>${member}</td>
+                    <td>${member.guildLevel}</td>
                   </tr>
                 </g:each>
               </tbody>
@@ -58,21 +51,21 @@
           </div>
           
           <div class="span6">
-            <h3>Top 15 Bonuses</h3>
+            <h3>Who Would Be Top 15</h3>
             <table class="table table-bordered table-condensed table-striped">
               <thead>
                 <tr>
-                  <th width="60%">Skill</th>
-                  <th width="20%">Level</th>
-                  <th width="20%">Bonus</th>
+                  <th width="60%">Member</th>
+                  <th width="20%">Guild</th>
+                  <th width="20%">Guild Level</th>
                 </tr>
               </thead>
               <tbody>
-                <g:each in="${bonuses}" var="skill">
+                <g:each in="${[0..2]}" var="member">
                   <tr>
-                    <td>${skill.skill.name}</td>
-                    <td>${skill.level}</td>
-                    <td>${skill.bonus}</td>
+                    <td>Someone</td>
+                    <td>Some Guild</td>
+                    <td>428</td>
                   </tr>
                 </g:each>
               </tbody>

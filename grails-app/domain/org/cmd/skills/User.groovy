@@ -9,7 +9,6 @@ class User {
     static belongsTo = [ guild: Guild ]
 
     Integer rating
-    Guild guild
     Integer guildLevel
     Integer deaths
     Boolean playerkiller = false
@@ -21,6 +20,11 @@ class User {
     boolean accountExpired
     boolean accountLocked
     boolean passwordExpired
+    
+    Integer years
+    Integer days
+    Integer hours
+    Integer minutes
 
     static constraints = {
         rating nullable: true
@@ -31,6 +35,10 @@ class User {
         lastUpdated nullable: true
         username blank: false, unique: true
         password blank: false
+        years nullable: true
+        days nullable: true
+        hours nullable: true
+        minutes nullable: true
     }
 
     static mapping = {

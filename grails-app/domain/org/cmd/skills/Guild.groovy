@@ -14,4 +14,8 @@ class Guild {
         name (nullable: false)
         root (nullable: false)
     }
+    
+    String toString() {
+        return name
+    }
 }

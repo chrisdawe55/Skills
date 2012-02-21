@@ -14,7 +14,7 @@
     
   <div class="well">
     <g:if test='${flash.message}'>
-      <div class='login_message'>${flash.message}</div>
+      <div class='alert alert-error'>${flash.message}</div>
     </g:if>
     
     <h1>Login</h1>
